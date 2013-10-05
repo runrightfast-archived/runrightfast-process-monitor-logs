@@ -19,8 +19,7 @@
 	"dependencies":{
 		"lodash":"2.2.x",
 		"log4js":"0.6.x",
-		"extend":"1.2.x",
-		"file":"0.2.x",
+		"extend":"1.2.x",		
 		"runrightfast-commons":"git://github.com/runrightfast/runrightfast-commons.git#0.0.12",
 		"pkginfo":"0.3.x"
 	},
@@ -32,6 +31,7 @@
 		"sinon":"~1.7.3",
 		"sinon-chai":"~2.4.0",
 		"grunt-mocha-cov":"~0.0.7",
-		"grunt-contrib-clean":"~0.5.0"		
+		"grunt-contrib-clean":"~0.5.0",
+		"file":"0.2.x"		
 	}
 }
