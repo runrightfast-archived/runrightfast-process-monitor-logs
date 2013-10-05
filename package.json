@@ -1,0 +1,34 @@
+{
+	"name":"runrightfast-process-monitor-logs",
+	"version":"0.0.1",
+	"description":"RunRightFast Commons",
+	"repository":{
+		"type":"git",
+		"url":"https://github.com/runrightfast/runrightfast-process-monitor-logs.git"
+	},
+	"main":"index",
+	"scripts":{
+		"blanket":{
+			"pattern":[
+				"lib/index.js"
+			]
+		}		
+	},
+	"author":"Alfio Zappala",
+	"license":"Apache v2",
+	"dependencies":{
+		"lodash":"2.2.x",
+		"log4js":"0.6.x",
+		"hoek":"1.1.x"
+	},
+	"devDependencies":{
+		"grunt":"~0.4.1",
+		"grunt-jslint":"~1.0.0",
+		"mocha":"~1.12.1",
+		"chai":"~1.7.2",
+		"sinon":"~1.7.3",
+		"sinon-chai":"~2.4.0",
+		"grunt-mocha-cov":"~0.0.7",
+		"grunt-contrib-clean":"~0.5.0"		
+	}
+}
