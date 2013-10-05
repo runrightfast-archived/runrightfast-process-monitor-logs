@@ -17,31 +17,87 @@
 'use strict';
 var expect = require('chai').expect;
 
-var config = require('../lib').config;
+var LogManager = require('..').LogManager;
+var fs = require('fs');
+var file = require('file');
+var path = require('path');
 
 describe('LogManager', function() {
+	var logDir = file.path.abspath('temp/logs');
 
-	it('can list the log files', function() {
+	var options = {
+		logDir : logDir,
+		logLevel : 'DEBUG'
+	};
+
+	console.log('logDir : ' + logDir);
+
+	before(function(done) {
+		file.mkdirs(logDir, parseInt('0755', 8), function(err) {
+			if (err) {
+				done(err);
+			} else {
+				done();
+			}
+		});
+	});
+
+	after(function(done) {
+		file.walk(logDir, function(err, path, dirs, names) {
+			names.forEach(function(name) {
+				fs.unlinkSync(name);
+				console.log('DELETED : ' + name);
+			});
+
+			done();
+		});
 
 	});
 
-	it('can gzip old logs', function() {
+	it('can watch a logDir for file changes', function(done) {
+		var logManager = new LogManager(options);
+		logManager.start();
+		expect(logManager.started()).to.equal(true);
+
+		var now = new Date();
+		var file = path.join(logDir, now.getMilliseconds() + '.txt');
+		fs.writeFile(file, '\nSOME DATA', function(err) {
+			if (err) {
+				done(err);
+			} else {
+				for ( var i = 0; i < 3; i++) {
+					fs.appendFileSync(file, 'data to append');
+				}
+				setImmediate(function() {
+					logManager.stop();
+					expect(logManager.watchEventCount).to.be.gt(0);
+					done();
+				});
+			}
+		});
+	});
+
+	it.skip('can list the log files', function() {
 
 	});
 
-	it('can delete old log files', function() {
+	it.skip('can gzip old logs', function() {
 
 	});
 
-	it('can tail a log file', function() {
+	it.skip('can delete old log files', function() {
 
 	});
 
-	it('can tail -n a log file', function() {
+	it.skip('can tail a log file', function() {
 
 	});
 
-	it('can head -n a log file', function() {
+	it.skip('can tail -n a log file', function() {
+
+	});
+
+	it.skip('can head -n a log file', function() {
 
 	});
 });

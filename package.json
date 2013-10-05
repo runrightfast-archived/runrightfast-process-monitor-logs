@@ -10,7 +10,7 @@
 	"scripts":{
 		"blanket":{
 			"pattern":[
-				"lib/index.js"
+				"lib/index.jsxxx"
 			]
 		}		
 	},
@@ -19,7 +19,10 @@
 	"dependencies":{
 		"lodash":"2.2.x",
 		"log4js":"0.6.x",
-		"hoek":"1.1.x"
+		"extend":"1.2.x",
+		"file":"0.2.x",
+		"runrightfast-commons":"git://github.com/runrightfast/runrightfast-commons.git#0.0.12",
+		"pkginfo":"0.3.x"
 	},
 	"devDependencies":{
 		"grunt":"~0.4.1",
