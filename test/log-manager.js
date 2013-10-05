@@ -43,15 +43,15 @@ describe('LogManager', function() {
 	});
 
 	after(function(done) {
-		file.walk(logDir, function(err, path, dirs, names) {
-			names.forEach(function(name) {
-				fs.unlinkSync(name);
-				console.log('DELETED : ' + name);
+		setTimeout(function() {
+			fs.readdir(logDir, function(err, names) {
+				names.forEach(function(name) {
+					fs.unlinkSync(path.join(logDir, name));
+					console.log('DELETED : ' + name);
+				});
+				done();
 			});
-
-			done();
-		});
-
+		}, 50);
 	});
 
 	it('can watch a logDir for file changes', function(done) {
@@ -60,29 +60,56 @@ describe('LogManager', function() {
 		expect(logManager.started()).to.equal(true);
 
 		var now = new Date();
-		var file = path.join(logDir, now.getMilliseconds() + '.txt');
-		fs.writeFile(file, '\nSOME DATA', function(err) {
+		var logFile = path.join(logDir, 'ops.' + now.getMilliseconds() + '.log.001');
+		fs.writeFile(logFile, '\nSOME DATA', function(err) {
 			if (err) {
+				console.error('*** writeFile failed : ' + err);
 				done(err);
 			} else {
 				for ( var i = 0; i < 3; i++) {
-					fs.appendFileSync(file, 'data to append');
+					fs.exists(logFile, function(exists) {
+						fs.appendFile(logFile, '\ndata to append', function(err) {
+							if (err) {
+								console.error('Append failed : ' + err);
+							} else {
+								console.log('Appended to : ' + logFile);
+							}
+						});
+					});
 				}
 				setImmediate(function() {
 					logManager.stop();
 					expect(logManager.watchEventCount).to.be.gt(0);
-					done();
+					setTimeout(done, 20);
 				});
 			}
 		});
 	});
 
-	it.skip('can list the log files', function() {
+	it.skip('can list the log files', function(done) {
 
 	});
 
-	it.skip('can gzip old logs', function() {
+	it('can gzip old logs', function(done) {
+		var logManager = new LogManager(options);
 
+		var now = new Date();
+		var logFile = path.join(logDir, 'ops.' + now.getMilliseconds() + '.log.001');
+		fs.writeFile(logFile, '\nSOME DATA', function(err) {
+			if (err) {
+				console.error('*** writeFile failed : ' + err);
+				done(err);
+			} else {
+				logManager.gzip(logFile);
+
+				setTimeout(function() {
+					expect(fs.existsSync(logFile)).to.equal(false);
+					expect(fs.existsSync(logFile + '.gz')).to.equal(true);
+					done();
+				}, 20);
+
+			}
+		});
 	});
 
 	it.skip('can delete old log files', function() {

@@ -10,7 +10,7 @@
 	"scripts":{
 		"blanket":{
 			"pattern":[
-				"lib/index.jsxxx"
+				"lib/log-manager.js"
 			]
 		}		
 	},
