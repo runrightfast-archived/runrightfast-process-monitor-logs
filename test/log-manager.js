@@ -112,6 +112,37 @@ describe('LogManager', function() {
 		});
 	});
 
+	it("gzips active log files that are beyond the max active log files limit", function(done) {
+		var logManager = new LogManager(options);
+		logManager.start();
+		expect(logManager.started()).to.equal(true);
+
+		var isDone = false;
+		for ( var i = 0; i <= logManager.maxNumberActiveFiles; i++) {
+			var logFile = path.join(logDir, 'ops.' + process.pid + '.log.00' + i);
+			fs.writeFile(logFile, '\nSOME DATA', function(err) {
+				if (err) {
+					console.error('*** writeFile failed : ' + err);
+					done(err);
+				} else {
+					setImmediate(function() {
+						if (isDone) {
+							return;
+						}
+						console.log('logManager.watchEventCount = ' + logManager.watchEventCount);
+						if (logManager.watchEventCount >= (logManager.maxNumberActiveFiles)) {
+							logManager.stop();
+							setTimeout(done, 100);
+							isDone = true;
+						}
+					});
+
+				}
+			});
+		}
+
+	});
+
 	it.skip('can delete old log files', function() {
 
 	});
