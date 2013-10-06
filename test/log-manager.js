@@ -21,6 +21,7 @@ var LogManager = require('..').LogManager;
 var fs = require('fs');
 var file = require('file');
 var path = require('path');
+var when = require('when');
 
 describe('LogManager', function() {
 	var logDir = file.path.abspath('temp/logs');
@@ -86,7 +87,19 @@ describe('LogManager', function() {
 		});
 	});
 
-	it.skip('can list the log files', function(done) {
+	it('can list the log files', function(done) {
+		var logManager = new LogManager(options);
+
+		var logFile = path.join(logDir, 'ops.' + new Date().getMilliseconds() + '.log.001');
+		fs.writeFileSync(logFile, '\nSOME DATA');
+		var promise = logManager.logDirectoryFilesPromise();
+		when(promise, function(files) {
+			console.log('files : ' + files);
+			expect(files.length).to.be.gt(0);
+			done();
+		}, function(err) {
+			done(err);
+		});
 
 	});
 
