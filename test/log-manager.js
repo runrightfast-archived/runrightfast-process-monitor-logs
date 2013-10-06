@@ -132,7 +132,15 @@ describe('LogManager', function() {
 						console.log('logManager.watchEventCount = ' + logManager.watchEventCount);
 						if (logManager.watchEventCount >= (logManager.maxNumberActiveFiles)) {
 							logManager.stop();
-							setTimeout(done, 100);
+							setTimeout(function() {
+								var expectedGzippedFile = path.join(logDir, 'ops.' + process.pid + '.log.000.gz');
+								expect(fs.existsSync(expectedGzippedFile)).to.equal(true);
+								for ( var ii = logManager.maxNumberActiveFiles; ii > 0; ii--) {
+									var expectedNonGzippedFile = path.join(logDir, 'ops.' + process.pid + '.log.00' + ii);
+									expect(fs.existsSync(expectedNonGzippedFile)).to.equal(true);
+								}
+								done();
+							}, 100);
 							isDone = true;
 						}
 					});
