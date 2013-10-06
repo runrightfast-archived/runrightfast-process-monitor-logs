@@ -188,11 +188,106 @@ describe('LogManager', function() {
 
 	});
 
-	it.skip('can tail a log file', function() {
+	it('can tail a log file', function(done) {
+		var logManager = new LogManager(options);
 
+		var logFile = path.join(logDir, 'ops.' + process.pid + '.log.001');
+		console.log('logFile = ' + logFile);
+		var data = '';
+		var i = 0;
+		for (i = 0; i < 20; i++) {
+			data += '\n***' + i;
+		}
+		fs.writeFileSync(logFile, data);
+
+		var tailOptions = {
+			file : logFile,
+			onDataCallback : function(data) {
+				console.log(data.toString());
+			},
+			onCloseCallback : function(code) {
+				console.log('code = ' + code);
+			},
+			onRegistrationCallback : function(err, file, listenerId) {
+				setTimeout(function() {
+					logManager.stopTailFollowing(file, listenerId);
+					done();
+				}, 100);
+			}
+		};
+
+		logManager.tailFollow(tailOptions);
+
+		for (i = 20; i < 40; i++) {
+			var ii = i;
+			fs.appendFile(logFile, '\n***' + ii, function(err) {
+				if (err) {
+					done(err);
+				}
+			});
+		}
 	});
 
-	it.skip('can tail -n a log file', function() {
+	it.only('stop will kill any processes that are tailing log files', function(done) {
+		var logManager = new LogManager(options);
+		logManager.start();
+
+		var logFile = path.join(logDir, 'ops.' + process.pid + '.log.001');
+		var data = '';
+		var i = 0;
+		for (i = 0; i < 20; i++) {
+			data += '\n***' + i;
+		}
+		fs.writeFileSync(logFile, data);
+
+		var tailOptions = {
+			file : logFile,
+			onDataCallback : function(data) {
+				console.log(data.toString());
+			},
+			onCloseCallback : function(code) {
+				console.log('code = ' + code);
+			},
+			onRegistrationCallback : function(err, file, listenerId) {
+				setTimeout(function() {
+					logManager.stop();
+					done();
+				}, 100);
+			}
+		};
+
+		logManager.tailFollow(tailOptions);
+
+		for (i = 20; i < 40; i++) {
+			var ii = i;
+			fs.appendFile(logFile, '\n***' + ii, function(err) {
+				if (err) {
+					done(err);
+				}
+			});
+		}
+	});
+
+	it('can tail -n a log file', function(done) {
+		var logManager = new LogManager(options);
+
+		var logFile = path.join(logDir, 'ops.' + process.pid + '.log.001');
+		var data = '';
+		for ( var i = 0; i < 20; i++) {
+			data += '\n***' + i;
+		}
+		fs.writeFileSync(logFile, data);
+
+		logManager.tail({
+			file : logFile,
+			onDataCallback : function(data) {
+				console.log(data.toString());
+			},
+			onCloseCallback : function(code) {
+				console.log('code = ' + code);
+				done();
+			}
+		});
 
 	});
 

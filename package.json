@@ -22,7 +22,8 @@
 		"extend":"1.2.x",		
 		"runrightfast-commons":"git://github.com/runrightfast/runrightfast-commons.git#0.0.12",
 		"pkginfo":"0.3.x",
-		"when":"2.5.x"
+		"when":"2.5.x",
+		"uuid":"1.4.x"
 	},
 	"devDependencies":{
 		"grunt":"~0.4.1",
