@@ -228,7 +228,58 @@ describe('LogManager', function() {
 		}
 	});
 
-	it.only('stop will kill any processes that are tailing log files', function(done) {
+	it('multiple listeners can tail the same log file', function(done) {
+		var logManager = new LogManager(options);
+		logManager.start();
+
+		var logFile = path.join(logDir, 'ops.' + process.pid + '.log.001');
+		console.log('logFile = ' + logFile);
+		var data = '';
+		var i = 0;
+		for (i = 0; i < 20; i++) {
+			data += '\n***' + i;
+		}
+		fs.writeFileSync(logFile, data);
+
+		var tailOptions1 = {
+			file : logFile,
+			onDataCallback : function(data) {
+				console.log('#1 - ' + data.toString());
+			},
+			onCloseCallback : function(code) {
+				console.log('#1 - ' + 'code = ' + code);
+			}
+		};
+
+		var tailOptions2 = {
+			file : logFile,
+			onDataCallback : function(data) {
+				console.log('#2 - ' + data.toString());
+			},
+			onCloseCallback : function(code) {
+				console.log('#2 - ' + 'code = ' + code);
+			}
+		};
+
+		logManager.tailFollow(tailOptions1);
+		logManager.tailFollow(tailOptions2);
+
+		for (i = 20; i < 40; i++) {
+			var ii = i;
+			fs.appendFile(logFile, '\n***' + ii, function(err) {
+				if (err) {
+					done(err);
+				}
+			});
+		}
+
+		setTimeout(function() {
+			logManager.stop();
+			done();
+		}, 100);
+	});
+
+	it('stop will kill any processes that are tailing log files', function(done) {
 		var logManager = new LogManager(options);
 		logManager.start();
 
@@ -291,7 +342,97 @@ describe('LogManager', function() {
 
 	});
 
-	it.skip('can head -n a log file', function() {
+	it('can head -n a log file', function(done) {
+		var logManager = new LogManager(options);
+
+		var logFile = path.join(logDir, 'ops.' + process.pid + '.log.001');
+		var data = '';
+		for ( var i = 0; i < 20; i++) {
+			data += '***' + i + '\n';
+		}
+		fs.writeFileSync(logFile, data);
+
+		logManager.head({
+			file : logFile,
+			onDataCallback : function(data) {
+				console.log(data.toString());
+			},
+			onCloseCallback : function(code) {
+				console.log('code = ' + code);
+				done();
+			}
+		});
+	});
+
+	it('start and stop can be called mulitple times with no harm', function() {
+		var logManager = new LogManager(options);
+		logManager.start();
+		expect(logManager.started()).to.equal(true);
+		logManager.start();
+		expect(logManager.started()).to.equal(true);
+
+		logManager.stop();
+		expect(logManager.started()).to.equal(false);
+		logManager.stop();
+		expect(logManager.started()).to.equal(false);
+	});
+
+	it('trying to gzip file that does not exist will simply log it', function() {
+		var logManager = new LogManager(options);
+		logManager.gzip('fsdfsdfsf');
+	});
+
+	it('trying to head a file that does not exist will simply log it', function() {
+		var logManager = new LogManager(options);
+
+		logManager.head({
+			file : 'sfsdfsfs',
+			onDataCallback : function(data) {
+				console.log(data.toString());
+			},
+			onCloseCallback : function(code) {
+				console.log('code = ' + code);
+				done();
+			}
+		});
+	});
+
+	it('trying to tail a file that does not exist will simply log it', function() {
+		var logManager = new LogManager(options);
+
+		logManager.tail({
+			file : 'sfsdfsfs',
+			onDataCallback : function(data) {
+				console.log(data.toString());
+			},
+			onCloseCallback : function(code) {
+				console.log('code = ' + code);
+				done();
+			}
+		});
+	});
+
+	it('trying to tail -f a file that does not exist will simply log it and notify the onRegistrationCallback with an Error', function(done) {
+		var logManager = new LogManager(options);
+
+		var tailOptions = {
+			file : 'sfsdfsdfsdf',
+			onDataCallback : function(data) {
+				console.log(data.toString());
+			},
+			onCloseCallback : function(code) {
+				console.log('code = ' + code);
+			},
+			onRegistrationCallback : function(err, file, listenerId) {
+				if (err) {
+					done();
+				} else {
+					done(new Error('expected an Error because the file does not exist'));
+				}
+			}
+		};
+
+		logManager.tailFollow(tailOptions);
 
 	});
 });
