@@ -10,7 +10,7 @@
 	"scripts":{
 		"blanket":{
 			"pattern":[
-				"lib/log-manager.jsXXX"
+				"lib/log-manager.js"
 			]
 		}		
 	},
@@ -21,7 +21,8 @@
 		"log4js":"0.6.x",
 		"extend":"1.2.x",		
 		"runrightfast-commons":"git://github.com/runrightfast/runrightfast-commons.git#0.0.12",
-		"pkginfo":"0.3.x"
+		"pkginfo":"0.3.x",
+		"when":"2.5.x"
 	},
 	"devDependencies":{
 		"grunt":"~0.4.1",
