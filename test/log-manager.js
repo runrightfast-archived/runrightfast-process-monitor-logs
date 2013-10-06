@@ -42,7 +42,7 @@ describe('LogManager', function() {
 		});
 	});
 
-	after(function(done) {
+	afterEach(function(done) {
 		setTimeout(function() {
 			fs.readdir(logDir, function(err, names) {
 				names.forEach(function(name) {
@@ -151,7 +151,27 @@ describe('LogManager', function() {
 
 	});
 
-	it.skip('can delete old log files', function() {
+	it('can delete old log files', function(done) {
+		var logManager = new LogManager(options);
+
+		logManager.start();
+
+		var logFile = path.join(logDir, 'ops.' + process.pid + '.log.001.gz');
+		fs.writeFileSync(logFile, 'SOME DATA');
+
+		var oldLogFile = path.join(logDir, 'ops.' + process.pid + '.log.002.gz');
+		fs.writeFileSync(oldLogFile, 'SOME DATA');
+		var expireTime = new Date(logManager.getLogsRetentionTimeMillis() - 1);
+		console.log('expireTime = ' + new Date(expireTime).toISOString());
+		console.log('logManager.getLogsRetentionTimeMillis() = ' + new Date(logManager.getLogsRetentionTimeMillis()).toISOString());
+		fs.utimesSync(oldLogFile, expireTime, expireTime);
+
+		setTimeout(function() {
+			logManager.stop();
+			expect(fs.existsSync(logFile)).to.equal(true);
+			expect(fs.existsSync(oldLogFile)).to.equal(false);
+			done();
+		}, 50);
 
 	});
 
