@@ -1,6 +1,6 @@
 {
 	"name":"runrightfast-process-monitor-logs",
-	"version":"0.0.5",
+	"version":"0.0.6",
 	"description":"RunRightFast Commons",
 	"repository":{
 		"type":"git",
@@ -23,7 +23,8 @@
 		"runrightfast-commons":"git://github.com/runrightfast/runrightfast-commons.git#0.0.12",
 		"pkginfo":"0.3.x",
 		"when":"2.5.x",
-		"uuid":"1.4.x"
+		"uuid":"1.4.x",
+		"file":"0.2.x"	
 	},
 	"devDependencies":{
 		"grunt":"~0.4.1",
@@ -33,7 +34,7 @@
 		"sinon":"~1.7.3",
 		"sinon-chai":"~2.4.0",
 		"grunt-mocha-cov":"~0.0.7",
-		"grunt-contrib-clean":"~0.5.0",
-		"file":"0.2.x"		
+		"grunt-contrib-clean":"~0.5.0"
+			
 	}
 }

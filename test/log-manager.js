@@ -87,6 +87,33 @@ describe('LogManager', function() {
 		});
 	});
 
+	it('can clean the log dir, i.e., rm -fr * on the log dir', function(done) {
+		var logManager = new LogManager(options);
+
+		var now = new Date();
+		var logFile = path.join(logDir, 'ops.' + now.getMilliseconds() + '.log.001');
+		var logFile2 = path.join(logDir, 'ops.' + now.getMilliseconds() + '.log.002');
+		fs.writeFileSync(logFile, '\nSOME DATA');
+		fs.writeFileSync(logFile2, '\nSOME DATA');
+
+		logManager.cleanLogDir();
+
+		setTimeout(function() {
+			when(logManager.logDirectoryFilesPromise(), function(files) {
+				console.log('files: ' + JSON.stringify(files));
+				console.log('files.length: ' + files.length);
+				if (files.length > 0) {
+					done(new Error('expected the log dir to be empty : ' + JSON.stringify(files)));
+				} else {
+					done();
+				}
+			}, function(error) {
+				done(error);
+			});
+		}, 100);
+
+	});
+
 	it('can list the log files', function(done) {
 		var logManager = new LogManager(options);
 
@@ -204,7 +231,7 @@ describe('LogManager', function() {
 
 	});
 
-	it.only('can tail a log file', function(done) {
+	it('can tail a log file', function(done) {
 		var logManager = new LogManager(options);
 
 		var logFile = path.join(logDir, 'ops.' + process.pid + '.log.001');
