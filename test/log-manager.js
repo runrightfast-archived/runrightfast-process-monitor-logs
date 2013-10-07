@@ -479,4 +479,34 @@ describe('LogManager', function() {
 		logManager.tailFollow(tailOptions);
 
 	});
+
+	it('can delete all non active log files', function(done) {
+		var logManager = new LogManager(options);
+
+		var logFile = path.join(logDir, 'ops.' + process.pid + '.log.001');
+		fs.writeFileSync(logFile, 'DATA');
+		for ( var i = 1; i <= 5; i++) {
+			if (i % 2 === 0) {
+				fs.writeFileSync(path.join(logDir, 'ops.' + process.pid + i + '.log.001'), 'DATA');
+			} else {
+				fs.writeFileSync(path.join(logDir, 'ops.' + process.pid + i + '.log.001.gz'), 'DATA');
+			}
+		}
+		fs.writeFileSync(path.join(logDir, 'ops.' + process.pid + i + '.log.001.tgz'), 'DATA');
+
+		when(logManager.logDirectoryFilesPromise(), function(files) {
+			expect(files.length).to.equal(7);
+			logManager.deleteAllNonActiveLogFiles();
+			setTimeout(function() {
+				when(logManager.logDirectoryFilesPromise(), function(files) {
+					if (files.length !== 2) {
+						done(new Error('Expected 2 files left but saw : ' + files));
+					} else {
+						done();
+					}
+				});
+			}, 50);
+		});
+
+	});
 });
