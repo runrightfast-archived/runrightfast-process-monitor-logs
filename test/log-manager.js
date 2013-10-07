@@ -204,7 +204,7 @@ describe('LogManager', function() {
 
 	});
 
-	it('can tail a log file', function(done) {
+	it.only('can tail a log file', function(done) {
 		var logManager = new LogManager(options);
 
 		var logFile = path.join(logDir, 'ops.' + process.pid + '.log.001');
@@ -229,7 +229,8 @@ describe('LogManager', function() {
 					logManager.stopTailFollowing(file, listenerId);
 					done();
 				}, 100);
-			}
+			},
+			lines : 5
 		};
 
 		logManager.tailFollow(tailOptions);
