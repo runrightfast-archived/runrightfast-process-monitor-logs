@@ -103,6 +103,22 @@ describe('LogManager', function() {
 
 	});
 
+	it('can list the log files with stats', function(done) {
+		var logManager = new LogManager(options);
+
+		var logFile = path.join(logDir, 'ops.' + new Date().getMilliseconds() + '.log.001');
+		fs.writeFileSync(logFile, '\nSOME DATA');
+		var promise = logManager.logDirectoryFilesWithStatsPromise();
+		when(promise, function(files) {
+			console.log('files : ' + JSON.stringify(files));
+			expect(files.length).to.be.gt(0);
+			done();
+		}, function(err) {
+			done(err);
+		});
+
+	});
+
 	it('can gzip old logs', function(done) {
 		var logManager = new LogManager(options);
 
